@@ -17,10 +17,14 @@ export class RequestHandlerService {
 
   async getAllGames(page: number, pageSize: number): Promise<ApiResponse> {
     //Retieve games from cache, otherwise retrieve from nbaService
+    const cacheId = this.uniqueIdGeneratorService.generateAllGamesId(
+      page,
+      pageSize,
+    );
 
     return {
-      data: 'data',
-      message: 'message',
+      data: cacheId,
+      message: 'Returning a cache',
     };
   }
 }
