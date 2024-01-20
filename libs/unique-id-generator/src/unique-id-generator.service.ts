@@ -13,11 +13,11 @@ export class UniqueIdGeneratorService {
     return this.generateHashedId(`all-games-${page}-${pageSize}`);
   }
 
-  generateGameId(gameId: string, gameDate: string): string {
-    return this.generateHashedId(`game-${gameId}-${gameDate}`);
+  generateGameId(gameId: string | number): string {
+    return this.generateHashedId(`game-${gameId}`);
   }
 
-  generateGameArticleId(gameId: string, gameDate: string): string {
+  generateGameArticleId(gameId: string | number, gameDate: string): string {
     return this.generateHashedId(`all-games-${gameId}-${gameDate}`);
   }
 

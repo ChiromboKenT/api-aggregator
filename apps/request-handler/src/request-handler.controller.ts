@@ -13,4 +13,17 @@ export class RequestHandlerController {
   ): Promise<ApiResponse> {
     return this.requestHandlerService.getAllGames(page, pageSize);
   }
+
+  @Get('/games/:id')
+  getGameById(@Query('id', ParseIntPipe) id: number): Promise<ApiResponse> {
+    return this.requestHandlerService.getGameById(id);
+  }
+
+  @Get('/games/:id/articles/:timestamp')
+  getGameArticlesById(
+    @Query('id', ParseIntPipe) id: number,
+    @Query('timestamp', ParseIntPipe) timestamp: number,
+  ): Promise<ApiResponse> {
+    return this.requestHandlerService.getGameArticlesById(id, timestamp);
+  }
 }

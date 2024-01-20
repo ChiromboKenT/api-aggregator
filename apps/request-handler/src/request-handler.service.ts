@@ -9,7 +9,8 @@ import {
 } from './request.dto';
 import { UniqueIdGeneratorService } from '@aggregator/unique-id-generator';
 import { CacheManagerService } from '@aggregator/cache-manager';
-import { title } from 'process';
+
+
 
 @Injectable()
 export class RequestHandlerService {
@@ -29,7 +30,7 @@ export class RequestHandlerService {
     if (cachedGames) {
       return {
         data: cachedGames,
-        message: 'Returning cached games',
+        message: 'Returning cached /games?page=1&pageSize=10',
       };
     }
 
@@ -48,7 +49,62 @@ export class RequestHandlerService {
         title: 'NBA 2K21',
         description: 'Basketball video game',
       },
-      message: 'Returning fresh games',
+      message: 'Successfully retrieved /games?page=1&pageSize=10',
+    };
+  }
+
+  async getGameById(id: number): Promise<ApiResponse> {
+    //Retieve game from cache, otherwise retrieve from nbaService
+    const cacheId = this.uniqueIdGeneratorService.generateGameId(id);
+
+    const cachedGame = await this.cacheManagerService.get(cacheId);
+    if (cachedGame) {
+      return {
+        data: cachedGame,
+        message: `Returning cached /games/${cacheId}`,
+      };
+    }
+
+    //const game = await this.nbaService.getGameById(id);
+
+    //Cache game
+    await this.cacheManagerService.set(cacheId, {});
+
+    return {
+      data: {},
+      message: 'Successfully retrieved /games/${cacheId}',
+    };
+  }
+
+  async getGameArticlesById(
+    id: number,
+    timestamp: number,
+  ): Promise<ApiResponse> {
+    //Retieve game articles from cache, otherwise aggregate data
+    const cacheId = this.uniqueIdGeneratorService.generateGameArticleId(
+      id,
+      timestamp.toString(),
+    );
+
+    const cachedGameArticles = await this.cacheManagerService.get(cacheId);
+
+    if (cachedGameArticles) {
+      return {
+        data: cachedGameArticles,
+        message: `Returning cached /games/${id}/articles/${timestamp}`,
+      };
+    }
+
+    //Aggregate data
+
+    //Cache game articles
+    await this.cacheManagerService.set(cacheId, {});
+
+    return {
+      data: {},
+      message: 'Successfully retrieved /games/${id}/articles/${timestamp}',
     };
   }
 }
+
+
