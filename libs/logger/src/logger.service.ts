@@ -1,45 +1,40 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-interface LoggerData<T> {
-  message: string;
-  data: T;
-}
-
-interface LoggerError<T> {
-  message: string;
-  error: T;
-}
+export type LogLevels = 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL';
+type logDetails = string | Record<string, unknown>;
 
 @Injectable()
 export class LoggerService {
-  constructor(@Inject('APP_NAME') private readonly appname: string) {}
+  constructor(@Inject('LOGGER') private readonly logger: any) {}
 
-  public debug<T = any>(data: LoggerData<T>) {
-    console.debug({
-      app_name: this.appname,
-      log_level: 'DEBUG',
-      data: typeof data === 'string' ? data : JSON.stringify(data),
+  info(message: string, data?: unknown) {
+    this.log('INFO', message, data);
+  }
+
+  trace(message: string, data?: unknown) {
+    console.trace('TRACE', {
+      ...this.logger,
+      message,
+      details: data,
     });
   }
 
-  public log<T = any>(data: LoggerData<T>) {
-    console.debug({
-      app_name: this.appname,
-      log_level: 'INFO',
-      data: typeof data === 'string' ? data : JSON.stringify(data),
-    });
+  debug(message: string, data?: unknown) {
+    this.log('DEBUG', message, data);
   }
 
-  public error<T = any>(error: LoggerError<T>, trace: boolean = false) {
-    const params = {
-      app_name: this.appname,
-      log_level: 'ERROR',
-      error,
-    };
-    if (trace) {
-      console.trace(params);
-    } else {
-      console.error(params);
-    }
+  warn(message: string, data?: unknown) {
+    this.log('WARN', message, data);
+  }
+
+  error(message: string, data?: unknown) {
+    this.log('ERROR', message, data);
+  }
+  private log(logLevel: LogLevels, message: string, data: unknown) {
+    console.log(logLevel, {
+      ...this.logger,
+      message,
+      details: data as logDetails,
+    });
   }
 }

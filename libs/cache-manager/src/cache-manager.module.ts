@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CacheManagerService } from './cache-manager.service';
 import { RedisModule, RedisModuleOptions } from '@liaoliaots/nestjs-redis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { LoggerModule } from '@aggregator/logger';
 
 /*
  * The CacheManagerModule is responsible for creating a CacheManagerService
@@ -20,6 +21,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    LoggerModule,
     ConfigModule.forRoot(),
     RedisModule.forRootAsync({
       imports: [ConfigModule],
@@ -37,6 +39,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       },
     }),
   ],
+
   providers: [CacheManagerService],
   exports: [CacheManagerService],
 })
