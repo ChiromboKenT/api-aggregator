@@ -77,7 +77,8 @@
     ],
     "moduleNameMapper": {
       "^aggregator /cache-manager(|/.*)$": "<rootDir>/libs/cache-manager/src/$1",
-      "^aggregator/unique-id-generator(|/.*)$": "<rootDir>/libs/unique-id-generator/src/$1"
+      "^aggregator/unique-id-generator(|/.*)$": "<rootDir>/libs/unique-id-generator/src/$1",
+      "^@aggregator/logger(|/.*)$": "<rootDir>/libs/logger/src/$1"
     }
   }
 }

@@ -19,10 +19,24 @@
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
     "paths": {
-      "@aggregator/cache-manager": ["libs/cache-manager/src"],
-      "@aggregator/cache-manager/*": ["libs/cache-manager/src/*"],
-      "@aggregator/unique-id-generator": ["libs/unique-id-generator/src"],
-      "@aggregator/unique-id-generator/*": ["libs/unique-id-generator/src/*"],
-    },
-  },
+      "@aggregator/cache-manager": [
+        "libs/cache-manager/src"
+      ],
+      "@aggregator/cache-manager/*": [
+        "libs/cache-manager/src/*"
+      ],
+      "@aggregator/unique-id-generator": [
+        "libs/unique-id-generator/src"
+      ],
+      "@aggregator/unique-id-generator/*": [
+        "libs/unique-id-generator/src/*"
+      ],
+      "@aggregator/logger": [
+        "libs/logger/src"
+      ],
+      "@aggregator/logger/*": [
+        "libs/logger/src/*"
+      ]
+    }
+  }
 }
