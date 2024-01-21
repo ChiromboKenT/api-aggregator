@@ -15,15 +15,16 @@ export class WeatherService implements Action {
   ) {}
 
   async run(body: any): Promise<void> {
-    const { requestId, date, location } = body;
+    const { requestId, date, location, ...payload } = body;
     const response = await this.fetchData(date, location);
 
     if (response) {
       await this.eventBus.sendEvent(
         {
           requestId,
-          serviceName: 'NBA_SERVICE',
-          response,
+          actionType: 'weather',
+          serviceName: 'WEATHER_SERVICE',
+          ...{ date, location, ...payload },
         },
         Events.API_RESOLVED,
       );

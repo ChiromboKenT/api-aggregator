@@ -15,14 +15,15 @@ export class NbaService implements Action {
   ) {}
 
   async run(body: any): Promise<void> {
-    const { gameId } = body;
+    const { requestId, gameId, ...payload } = body;
     const response = await this.fetchGameById(gameId);
     if (response) {
       await this.eventBus.sendEvent(
         {
-          gameId,
+          requestId,
+          actionType: 'nba',
           serviceName: 'NBA_SERVICE',
-          body,
+          payload,
         },
         Events.API_RESOLVED,
       );
