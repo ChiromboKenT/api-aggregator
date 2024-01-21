@@ -20,6 +20,8 @@
     "@aggregator/db-manager/(.*)": "<rootDir>/../libs/db-manager/src/$1",
     "@aggregator/db-manager": "<rootDir>/../libs/db-manager/src",
     "@aggregator/common-types/(.*)": "<rootDir>/../libs/common-types/src/$1",
-    "@aggregator/common-types": "<rootDir>/../libs/common-types/src"
+    "@aggregator/common-types": "<rootDir>/../libs/common-types/src",
+    "@aggregator/sqs-manager/(.*)": "<rootDir>/../libs/sqs-manager/src/$1",
+    "@aggregator/sqs-manager": "<rootDir>/../libs/sqs-manager/src"
   }
 }

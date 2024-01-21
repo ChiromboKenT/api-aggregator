@@ -83,7 +83,8 @@
       "^aggregator/unique-id-generator(|/.*)$": "<rootDir>/libs/unique-id-generator/src/$1",
       "^@aggregator/logger(|/.*)$": "<rootDir>/libs/logger/src/$1",
       "^@aggregator/db-manager(|/.*)$": "<rootDir>/libs/db-manager/src/$1",
-      "^@aggregator/common-types(|/.*)$": "<rootDir>/libs/common-types/src/$1"
+      "^@aggregator/common-types(|/.*)$": "<rootDir>/libs/common-types/src/$1",
+      "^@aggregator/sqs-manager(|/.*)$": "<rootDir>/libs/sqs-manager/src/$1"
     }
   }
 }

@@ -48,6 +48,12 @@
       ],
       "@aggregator/common-types/*": [
         "libs/common-types/src/*"
+      ],
+      "@aggregator/sqs-manager": [
+        "libs/sqs-manager/src"
+      ],
+      "@aggregator/sqs-manager/*": [
+        "libs/sqs-manager/src/*"
       ]
     }
   }

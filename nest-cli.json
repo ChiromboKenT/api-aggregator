@@ -61,6 +61,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/common-types/tsconfig.lib.json"
       }
+    },
+    "sqs-manager": {
+      "type": "library",
+      "root": "libs/sqs-manager",
+      "entryFile": "index",
+      "sourceRoot": "libs/sqs-manager/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/sqs-manager/tsconfig.lib.json"
+      }
     }
   }
 }
