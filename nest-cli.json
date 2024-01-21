@@ -79,6 +79,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/sns-manager/tsconfig.lib.json"
       }
+    },
+    "external-api-handler": {
+      "type": "application",
+      "root": "apps/external-api-handler",
+      "entryFile": "main",
+      "sourceRoot": "apps/external-api-handler/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/external-api-handler/tsconfig.app.json"
+      }
     }
   }
 }
