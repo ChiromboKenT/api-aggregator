@@ -43,6 +43,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/logger/tsconfig.lib.json"
       }
+    },
+    "db-manager": {
+      "type": "library",
+      "root": "libs/db-manager",
+      "entryFile": "index",
+      "sourceRoot": "libs/db-manager/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/db-manager/tsconfig.lib.json"
+      }
+    },
+    "common-types": {
+      "type": "library",
+      "root": "libs/common-types",
+      "entryFile": "index",
+      "sourceRoot": "libs/common-types/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/common-types/tsconfig.lib.json"
+      }
     }
   }
 }

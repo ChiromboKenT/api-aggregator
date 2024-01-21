@@ -25,7 +25,9 @@
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
+    "aws-sdk": "^2.1540.0",
     "ioredis": "^5.3.2",
+    "nest-aws-sdk": "^3.0.1",
     "redis": "^4.6.12",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
@@ -78,7 +80,9 @@
     "moduleNameMapper": {
       "^aggregator /cache-manager(|/.*)$": "<rootDir>/libs/cache-manager/src/$1",
       "^aggregator/unique-id-generator(|/.*)$": "<rootDir>/libs/unique-id-generator/src/$1",
-      "^@aggregator/logger(|/.*)$": "<rootDir>/libs/logger/src/$1"
+      "^@aggregator/logger(|/.*)$": "<rootDir>/libs/logger/src/$1",
+      "^@aggregator/db-manager(|/.*)$": "<rootDir>/libs/db-manager/src/$1",
+      "^@aggregator/common-types(|/.*)$": "<rootDir>/libs/common-types/src/$1"
     }
   }
 }

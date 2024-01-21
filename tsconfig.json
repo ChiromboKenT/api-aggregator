@@ -36,6 +36,18 @@
       ],
       "@aggregator/logger/*": [
         "libs/logger/src/*"
+      ],
+      "@aggregator/db-manager": [
+        "libs/db-manager/src"
+      ],
+      "@aggregator/db-manager/*": [
+        "libs/db-manager/src/*"
+      ],
+      "@aggregator/common-types": [
+        "libs/common-types/src"
+      ],
+      "@aggregator/common-types/*": [
+        "libs/common-types/src/*"
       ]
     }
   }
