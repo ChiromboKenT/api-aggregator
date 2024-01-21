@@ -1,27 +1,41 @@
-import { Injectable } from '@nestjs/common';
 import { LoggerService } from '@aggregator/logger';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import axios from 'axios';
 
 @Injectable()
 export class WeatherService {
   constructor(
-    private readonly loggerService: LoggerService,
-    private readonly configService: ConfigService,
+    private readonly logger: LoggerService,
+    private readonly config: ConfigService,
   ) {}
 
-  async fetchWeather(date: Date): Promise<any> {
-    // Fetch weather data for the given date
+  async fetchData(date: string, location: string): Promise<any> {
+    const options = {
+      method: 'GET',
+      url: `${this.config.get('RAPID_API_URL')}/weather/historical/${date}`,
+      params: {
+        startDateTime: date,
+        aggregateHours: '24',
+        location: location,
+        endDateTime: date,
+        unitGroup: 'metric',
+        contentType: 'json',
+        shortColumnNames: '0',
+      },
+      headers: {
+        'X-RapidAPI-Key': `${this.config.get('RAPID_API_KEY')}`,
+        'X-RapidAPI-Host': `${this.config.get('RAPID_API_HOST')}`,
+      },
+    };
 
-    // Log the data using the logger service
-    this.loggerService.info(`Fetching weather for ${date.toISOString()}`);
-
-    // Get configuration values using the config service
-    const apiKey = this.configService.get<string>('weather.apiKey');
-    const apiUrl = this.configService.get<string>('weather.apiUrl');
-
-    // Make API request to fetch weather data using the apiKey and apiUrl
-
-    // Return the fetched weather data
-    return true;
+    try {
+      const response = await axios(options);
+      this.logger.info(response.data);
+      return response.data;
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
   }
 }
