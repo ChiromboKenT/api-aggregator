@@ -1,14 +1,34 @@
 import { LoggerService } from '@aggregator/logger';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import { Action } from '../types';
+import { EventsService } from '@aggregator/events';
+import { Events } from '@aggregator/events/events';
 
 @Injectable()
-export class WeatherService {
+export class WeatherService implements Action {
   constructor(
     private readonly logger: LoggerService,
     private readonly config: ConfigService,
+    @Inject(EventsService) private readonly eventBus: EventsService,
   ) {}
+
+  async run(body: any): Promise<void> {
+    const { requestId, date, location } = body;
+    const response = await this.fetchData(date, location);
+
+    if (response) {
+      await this.eventBus.sendEvent(
+        {
+          requestId,
+          serviceName: 'NBA_SERVICE',
+          response,
+        },
+        Events.API_RESOLVED,
+      );
+    }
+  }
 
   async fetchData(date: string, location: string): Promise<any> {
     const options = {

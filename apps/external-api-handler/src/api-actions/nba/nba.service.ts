@@ -1,14 +1,33 @@
 import { LoggerService } from '@aggregator/logger';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import { Action } from '../types';
+import { EventsService } from '@aggregator/events';
+import { Events } from '@aggregator/events/events';
 
 @Injectable()
-export class NbaService {
+export class NbaService implements Action {
   constructor(
     private readonly logger: LoggerService,
     private readonly config: ConfigService,
+    @Inject(EventsService) private readonly eventBus: EventsService,
   ) {}
+
+  async run(body: any): Promise<void> {
+    const { gameId } = body;
+    const response = await this.fetchGameById(gameId);
+    if (response) {
+      await this.eventBus.sendEvent(
+        {
+          gameId,
+          serviceName: 'NBA_SERVICE',
+          body,
+        },
+        Events.API_RESOLVED,
+      );
+    }
+  }
 
   /**
    * Fetches a single game's data by ID from the specified API endpoint.

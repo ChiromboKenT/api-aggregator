@@ -60,6 +60,12 @@
       ],
       "@aggregator/sns-manager/*": [
         "libs/sns-manager/src/*"
+      ],
+      "@aggregator/events": [
+        "libs/events/src"
+      ],
+      "@aggregator/events/*": [
+        "libs/events/src/*"
       ]
     }
   }

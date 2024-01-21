@@ -88,6 +88,24 @@
       "compilerOptions": {
         "tsConfigPath": "apps/external-api-handler/tsconfig.app.json"
       }
+    },
+    "aggregator-core": {
+      "type": "application",
+      "root": "apps/aggregator-core",
+      "entryFile": "main",
+      "sourceRoot": "apps/aggregator-core/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/aggregator-core/tsconfig.app.json"
+      }
+    },
+    "events": {
+      "type": "library",
+      "root": "libs/events",
+      "entryFile": "index",
+      "sourceRoot": "libs/events/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/events/tsconfig.lib.json"
+      }
     }
   }
 }
