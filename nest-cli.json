@@ -70,6 +70,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/sqs-manager/tsconfig.lib.json"
       }
+    },
+    "sns-manager": {
+      "type": "library",
+      "root": "libs/sns-manager",
+      "entryFile": "index",
+      "sourceRoot": "libs/sns-manager/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/sns-manager/tsconfig.lib.json"
+      }
     }
   }
 }

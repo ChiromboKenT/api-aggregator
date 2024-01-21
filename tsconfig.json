@@ -54,6 +54,12 @@
       ],
       "@aggregator/sqs-manager/*": [
         "libs/sqs-manager/src/*"
+      ],
+      "@aggregator/sns-manager": [
+        "libs/sns-manager/src"
+      ],
+      "@aggregator/sns-manager/*": [
+        "libs/sns-manager/src/*"
       ]
     }
   }
