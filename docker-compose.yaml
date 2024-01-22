@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+ localstack:
+    image: localstack/localstack:0.13.3
+    ports:
+      - "127.0.0.1:4510-4530:4510-4530"
+      - "127.0.0.1:4566:4566"
+      - "127.0.0.1:4571:4571"
+    environment:
+      - SERVICES=sns,sqs,dynamodb
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DEFAULT_REGION=eu-central-1
+    volumes:
+      - ~/tmp/localstack:/tmp/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - api-aggregator
+  localstack-setup:
+    image: cgswong/aws
+    depends_on:
+      - localstack
+    volumes:
+      - ./scripts/resources/:/resources/
+      - ./scripts/init-localstack.sh:/entrypoint.sh
+    entrypoint: [ "/entrypoint.sh" ]
+    environment:
+      - LOCALSTACK=localstack
+    networks:
+      - api-aggregator
+  request-handler:
+    platform: linux/amd64
+    depends_on:
+      - localstack
+      - localstack-setup
+    build:
+      context: .
+      target: development
+    env_file:
+      - .env
+    environment:
+      - APP_NAME=request-handler
+      - DATABASE_URL=
+    volumes:
+      - ./:/home/node/app/
+      - ./scripts/aws/:/root/.aws/
+    entrypoint: /usr/local/bin/node
+    command: ./node_modules/@nestjs/cli/bin/nest.js start request-handler --watch
+    mem_reservation: 512M
+    ports:
+      - 6010:3000
+      - 9210:9229
+    networks:
+      - api-aggregator
+  aggregator-core:
+    platform: linux/amd64
+    depends_on:
+      - localstack
+      - localstack-setup
+    build:
+      context: .
+      target: development
+    env_file:
+      - .env
+    environment:
+      - APP_NAME=aggregator-core
+    volumes:
+      - ./:/home/node/app/
+      - ./scripts/aws/:/root/.aws/
+    entrypoint: /usr/local/bin/node
+    command: ./node_modules/@nestjs/cli/bin/nest.js start aggregator-core --watch
+    mem_reservation: 1G
+    ports:
+      - 6000:3002
+      - 9201:9229
+    networks:
+      - api-aggregator
+  broadcaster:
+    platform: linux/amd64
+    depends_on:
+      - localstack
+      - localstack-setup
+    build:
+      context: .
+      target: development
+    env_file:
+      - .env
+    environment:
+      - APP_NAME=broadcaster
+    volumes:
+      - ./:/home/node/app/
+      - ./scripts/aws/:/root/.aws/
+    entrypoint: /usr/local/bin/node
+    command: ./node_modules/@nestjs/cli/bin/nest.js start broadcaster --watch
+    mem_reservation: 256M
+    ports:
+      - 6002:3003
+      - 9200:9229
+      - 6004:3002
+    networks:
+      - api-aggregator
+
+  external-api:
+    platform: linux/amd64
+    depends_on:
+      - localstack
+      - localstack-setup
+      - postgres
+    build:
+      context: .
+      target: development
+    env_file:
+      - .env
+    environment:
+      - APP_NAME=external-api-handler
+    volumes:
+      - ./:/home/node/app/
+      - ./scripts/aws/:/root/.aws/
+    entrypoint: /usr/local/bin/node
+    command: ./node_modules/@nestjs/cli/bin/nest.js start external-api-handler --watch
+    mem_reservation: 256M
+    ports:
+      - 6003:3001
+      - 9203:9229
+    networks:
+      - api-aggregator
+
+networks:
+  api-aggregator:
+    driver: "bridge"
+

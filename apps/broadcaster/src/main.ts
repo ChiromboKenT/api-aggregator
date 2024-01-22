@@ -7,7 +7,7 @@ async function bootstrap() {
   const listener = app.get(Listener);
 
   listener.start();
-  await app.listen(process.env.APP_PORT || 3000);
+  await app.listen(process.env.APP_PORT || 3003);
 }
 
 bootstrap();
