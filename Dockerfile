@@ -5,15 +5,14 @@ WORKDIR /home/node/app
 COPY --chown=node:node . .
 
 RUN apk update && \
-    apk upgrade && \
+    apk upgrade
 
 
 # deps
 FROM base AS deps
 RUN npm ci --legacy-peer-deps --only=prod --ignore-scripts \
     && cp -R node_modules prod_node_modules \
-    && npm ci --legacy-peer-deps --ignore-scripts \
-    && rm .npmrc
+    && npm ci --legacy-peer-deps --ignore-scripts
 
 # development
 FROM base AS development
@@ -22,7 +21,6 @@ COPY --from=deps --chown=node:node /home/node/app/node_modules ./node_modules
 # build
 FROM development AS build
 ARG APP_NAME
-
 
 RUN ./node_modules/@nestjs/cli/bin/nest.js build ${APP_NAME}
 

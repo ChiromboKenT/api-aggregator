@@ -3,13 +3,18 @@ import { RequestHandlerController } from './request-handler.controller';
 import { RequestHandlerService } from './request-handler.service';
 import { UniqueIdGeneratorModule } from '@aggregator/unique-id-generator';
 import { CacheManagerModule } from '@aggregator/cache-manager';
-import { AggregatorModule } from 'apps/aggregator/src/aggregator.module';
-import { NbaService } from './nba/nba.service';
-import { WeatherService } from './weather/weather.service';
+import { ConfigModule } from '@nestjs/config';
+import { EventsModule } from '@aggregator/events';
 
 @Module({
-  imports: [UniqueIdGeneratorModule, CacheManagerModule, AggregatorModule],
+  imports: [
+    UniqueIdGeneratorModule,
+    CacheManagerModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    CacheManagerModule,
+    EventsModule,
+  ],
   controllers: [RequestHandlerController],
-  providers: [RequestHandlerService, NbaService, WeatherService],
+  providers: [RequestHandlerService],
 })
 export class RequestHandlerModule {}

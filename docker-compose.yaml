@@ -1,7 +1,6 @@
 version: '3.8'
-
 services:
- localstack:
+  localstack:
     image: localstack/localstack:0.13.3
     ports:
       - "127.0.0.1:4510-4530:4510-4530"
@@ -105,7 +104,6 @@ services:
     depends_on:
       - localstack
       - localstack-setup
-      - postgres
     build:
       context: .
       target: development

@@ -1,4 +1,4 @@
-interface EventMessage<P> {
+export interface EventMessage<P> {
   requestId: string;
   serviceName: string;
   actionType: string;

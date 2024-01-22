@@ -3,6 +3,7 @@ import { LoggerService } from '@aggregator/logger';
 import { Inject, Injectable } from '@nestjs/common';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { NBAGame, Weather } from './types';
+import { EventMessage } from '@aggregator/common-types/types';
 
 @Injectable()
 export class AggregatorCoreService {

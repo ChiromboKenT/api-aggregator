@@ -9,14 +9,15 @@ import {
 } from './request.dto';
 import { UniqueIdGeneratorService } from '@aggregator/unique-id-generator';
 import { CacheManagerService } from '@aggregator/cache-manager';
-
-
+import { EventsService } from '@aggregator/events';
+import { Events } from '@aggregator/events/events';
 
 @Injectable()
 export class RequestHandlerService {
   constructor(
     private readonly uniqueIdGeneratorService: UniqueIdGeneratorService,
     private readonly cacheManagerService: CacheManagerService,
+    @Inject(EventsService) private readonly eventBus: EventsService,
   ) {}
 
   async getAllGames(page: number, pageSize: number): Promise<ApiResponse> {
@@ -96,6 +97,8 @@ export class RequestHandlerService {
     }
 
     //Aggregate data
+    await this.triggerAggregatorEvent(cacheId, 'nba', { id, timestamp });
+    await this.triggerAggregatorEvent(cacheId, 'weather', { id, timestamp });
 
     //Cache game articles
     await this.cacheManagerService.set(cacheId, {});
@@ -104,6 +107,22 @@ export class RequestHandlerService {
       data: {},
       message: 'Successfully retrieved /games/${id}/articles/${timestamp}',
     };
+  }
+
+  private async triggerAggregatorEvent(
+    cacheId: string,
+    actionType: string,
+    payload: any,
+  ): Promise<void> {
+    await this.eventBus.sendEvent(
+      {
+        requestId: cacheId,
+        serviceName: 'REQUEST_HANDLER',
+        actionType,
+        payload,
+      },
+      Events.AGGREGATOR_TRIGGERED,
+    );
   }
 }
 
