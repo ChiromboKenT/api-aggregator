@@ -33,6 +33,17 @@ export class DbManagerService {
     }
   }
 
+  async queryItems(
+    params: DocumentClient.QueryInput,
+  ): Promise<DocumentClient.ItemList | Error> {
+    try {
+      const result = await this.dynamoDbClient.query(params).promise();
+      return result.Items || [];
+    } catch (error) {
+      return this.handleDynamoDbError(error);
+    }
+  }
+
   async updateItem(
     params: DocumentClient.UpdateItemInput,
   ): Promise<boolean | Error> {
