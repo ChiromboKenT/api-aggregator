@@ -43,8 +43,8 @@ wait_for_localstack_services_to_be_ready_fn
 
 echo "All needed localstack services are working"
 TOPIC_NAME="api_event_bus_local"
-echo "Creating SNS queue ${TOPIC_NAME}"
-aws --endpoint-url=http://localstack:4566 sns create-topic --name ${TOPIC}
+echo "Creating SNS topic ${TOPIC_NAME}"
+aws --endpoint-url=http://localstack:4566 sns create-topic --name ${TOPIC_NAME}
 
 cd /resources || exit 1
 for f in *.sh; do
