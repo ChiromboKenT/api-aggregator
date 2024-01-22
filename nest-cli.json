@@ -106,6 +106,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/events/tsconfig.lib.json"
       }
+    },
+    "broadcaster": {
+      "type": "application",
+      "root": "apps/broadcaster",
+      "entryFile": "main",
+      "sourceRoot": "apps/broadcaster/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/broadcaster/tsconfig.app.json"
+      }
     }
   }
 }

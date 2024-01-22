@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 
 @Controller()
-export class ExternalApiHandlerController {
+export class AggregatorCoreController {
   constructor() {}
 
   @Get()
