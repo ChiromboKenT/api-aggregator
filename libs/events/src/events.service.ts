@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { EventAttributes, EventType } from './events';
 import { SnsManagerService } from '@aggregator/sns-manager';
 import { LoggerService } from '@aggregator/logger';
+import { v4 as uuid4 } from 'uuid';
 
 @Injectable()
 export class EventsService {
@@ -19,8 +20,20 @@ export class EventsService {
 
     const messageAttributes = Object.assign({}, attributes, {
       EVENT: eventType,
+      correlationId: uuid4(),
     });
 
-    await this.sns.send(message, messageAttributes);
+    this.logger.info(
+      `Sending event ${eventType} with attributes ${JSON.stringify(
+        messageAttributes,
+      )}`,
+    );
+
+    try {
+      await this.sns.send(message, messageAttributes);
+    } catch (error) {
+      this.logger.error(error);
+      throw error;
+    }
   }
 }

@@ -4,9 +4,18 @@ import { WeatherService } from './weather/weather.service';
 import { DbManagerModule } from '@aggregator/db-manager';
 import { ActionsDictionary } from './actions-dictionary';
 import { CacheManagerModule } from '@aggregator/cache-manager';
+import { LoggerModule } from '@aggregator/logger';
+import { ConfigModule } from '@nestjs/config';
+import { EventsModule } from '@aggregator/events';
 
 @Module({
-  imports: [DbManagerModule, CacheManagerModule],
+  imports: [
+    DbManagerModule,
+    CacheManagerModule,
+    LoggerModule,
+    ConfigModule.forRoot(),
+    EventsModule,
+  ],
   providers: [
     {
       provide: 'ACTION_LIST',
@@ -18,6 +27,9 @@ import { CacheManagerModule } from '@aggregator/cache-manager';
       },
       inject: [NbaService, WeatherService],
     },
+    ActionsDictionary,
+    NbaService,
+    WeatherService,
   ],
   exports: [ActionsDictionary, 'ACTION_LIST'],
 })

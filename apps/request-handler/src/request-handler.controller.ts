@@ -4,7 +4,7 @@ import { ApiResponse } from './request.dto';
 import { Response } from 'express';
 import { v4 as uuid4 } from 'uuid';
 
-@Controller('api/v1/sse/')
+@Controller('api/v1/sse')
 export class RequestHandlerController {
   constructor(private readonly requestHandlerService: RequestHandlerService) {}
 

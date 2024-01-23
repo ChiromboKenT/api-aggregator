@@ -1,21 +1,21 @@
 import { Module } from '@nestjs/common';
-import { BroadcasterController } from './broadcaster.controller';
-import { BroadcasterService } from './broadcaster.service';
-import { SseManagerModule } from '@aggregator/sse-manager';
+
 import { LoggerModule } from '@aggregator/logger';
 import { EventsModule } from '@aggregator/events';
 import { SqsManagerModule } from '@aggregator/sqs-manager';
 import { DbManagerModule } from '@aggregator/db-manager';
+import { Listener } from './listener';
+import { SseManagerModule } from '@aggregator/sse-manager';
 
 @Module({
   imports: [
-    SseManagerModule,
-    SqsManagerModule,
+    SqsManagerModule.forRoot({ url: process.env.BROADCASTER_LISTENER_SQS }),
     DbManagerModule,
     LoggerModule,
     EventsModule,
+    SseManagerModule,
   ],
-  controllers: [BroadcasterController],
-  providers: [BroadcasterService],
+  controllers: [],
+  providers: [Listener],
 })
 export class BroadcasterModule {}
