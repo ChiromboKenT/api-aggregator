@@ -20,7 +20,21 @@ Verify the deployment by navigating to your server address in
 your preferred browseror use postman.
 
 ```bash
-127.0.0.1:6010
+https://localhost:6010
+```
+
+Example Endpoints
+- Get All Games /games
+  ```bash
+    curl -X GET "http://localhost:6010/api/v1/sse/games?page=1&pageSize=10"
+  ```
+- Get a Single Game /games/:id/:timestamp
+```bash
+  curl -X GET "http://localhost:6010/api/v1/sse/games/20
+```
+- Get Aggregated data - Game Article /games/:id/articles/:timestamp
+```bash
+  curl -X GET "http://localhost:6010/api/v1/sse/games/20/1546293600
 ```
 
 
