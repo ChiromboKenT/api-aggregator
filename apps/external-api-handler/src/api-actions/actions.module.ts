@@ -3,9 +3,10 @@ import { NbaService } from './nba/nba.service';
 import { WeatherService } from './weather/weather.service';
 import { DbManagerModule } from '@aggregator/db-manager';
 import { ActionsDictionary } from './actions-dictionary';
+import { CacheManagerModule } from '@aggregator/cache-manager';
 
 @Module({
-  imports: [DbManagerModule],
+  imports: [DbManagerModule, CacheManagerModule],
   providers: [
     {
       provide: 'ACTION_LIST',

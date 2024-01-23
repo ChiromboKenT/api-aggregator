@@ -26,6 +26,8 @@
     "@aggregator/sns-manager/(.*)": "<rootDir>/../libs/sns-manager/src/$1",
     "@aggregator/sns-manager": "<rootDir>/../libs/sns-manager/src",
     "@aggregator/events/(.*)": "<rootDir>/../libs/events/src/$1",
-    "@aggregator/events": "<rootDir>/../libs/events/src"
+    "@aggregator/events": "<rootDir>/../libs/events/src",
+    "@aggregator/sse-manager/(.*)": "<rootDir>/../libs/sse-manager/src/$1",
+    "@aggregator/sse-manager": "<rootDir>/../libs/sse-manager/src"
   }
 }

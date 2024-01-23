@@ -66,6 +66,12 @@
       ],
       "@aggregator/events/*": [
         "libs/events/src/*"
+      ],
+      "@aggregator/sse-manager": [
+        "libs/sse-manager/src"
+      ],
+      "@aggregator/sse-manager/*": [
+        "libs/sse-manager/src/*"
       ]
     }
   }

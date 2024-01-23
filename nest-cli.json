@@ -115,6 +115,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/broadcaster/tsconfig.app.json"
       }
+    },
+    "sse-manager": {
+      "type": "library",
+      "root": "libs/sse-manager",
+      "entryFile": "index",
+      "sourceRoot": "libs/sse-manager/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/sse-manager/tsconfig.lib.json"
+      }
     }
   }
 }

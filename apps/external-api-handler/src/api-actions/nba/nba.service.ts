@@ -5,19 +5,23 @@ import axios from 'axios';
 import { Action } from '../types';
 import { EventsService } from '@aggregator/events';
 import { Events } from '@aggregator/events/events';
+import { CacheManagerService } from '@aggregator/cache-manager';
 
 @Injectable()
 export class NbaService implements Action {
   constructor(
     private readonly logger: LoggerService,
     private readonly config: ConfigService,
+    @Inject(CacheManagerService)
+    private readonly cacheManager: CacheManagerService,
     @Inject(EventsService) private readonly eventBus: EventsService,
   ) {}
 
   async run(body: any): Promise<void> {
-    const { requestId, gameId, ...payload } = body;
-    const response = await this.fetchGameById(gameId);
+    const { requestId, ...payload } = body;
+    const response = await this.fetchGameById(payload.gameId);
     if (response) {
+      await this.cacheManager.set(requestId, response.data);
       await this.eventBus.sendEvent(
         {
           requestId,
@@ -26,6 +30,44 @@ export class NbaService implements Action {
           payload,
         },
         Events.API_RESOLVED,
+      );
+    }
+  }
+
+  async handleGetAllGames(body: any): Promise<void> {
+    const { requestId } = body;
+    const { clientId, page, pageSize } = body.payload;
+    const response = await this.fetchAllGames(page, pageSize);
+    if (response) {
+      await this.cacheManager.set(requestId, response.data);
+      await await this.eventBus.sendEvent(
+        {
+          requestId,
+          clientId,
+          actionType: 'nba',
+          serviceName: 'NBA_SERVICE',
+          payload: response.data,
+        },
+        Events.API_REQUEST_COMPLETED,
+      );
+    }
+  }
+
+  async handleGetGameById(body: any): Promise<void> {
+    const { requestId } = body;
+    const { gameId, clientId } = body.payload;
+    const response = await this.fetchGameById(gameId);
+    if (response) {
+      await this.cacheManager.set(requestId, response.data);
+      await this.eventBus.sendEvent(
+        {
+          requestId,
+          clientId,
+          actionType: 'nba',
+          serviceName: 'NBA_SERVICE',
+          payload: response.data,
+        },
+        Events.API_REQUEST_COMPLETED,
       );
     }
   }

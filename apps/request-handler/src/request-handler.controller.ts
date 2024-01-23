@@ -1,29 +1,99 @@
-import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, ParseIntPipe, Query, Res } from '@nestjs/common';
 import { RequestHandlerService } from './request-handler.service';
 import { ApiResponse } from './request.dto';
+import { Response } from 'express';
+import { v4 as uuid4 } from 'uuid';
 
-@Controller('api/v1')
+@Controller('api/v1/sse/')
 export class RequestHandlerController {
   constructor(private readonly requestHandlerService: RequestHandlerService) {}
 
   @Get('/games')
-  getAllGames(
+  async getAllGames(
     @Query('page', ParseIntPipe) page: number = 1,
     @Query('pageSize', ParseIntPipe) pageSize: number = 10,
-  ): Promise<ApiResponse> {
-    return this.requestHandlerService.getAllGames(page, pageSize);
+    @Res() response: Response,
+  ) {
+    //Use SSE to send updates to the client
+    const clientId = uuid4();
+
+    //Initiate the get all games service
+    await this.requestHandlerService.getAllGames(page, pageSize, clientId);
+
+    // Register the client to receive updates
+    const unsubscribe = this.requestHandlerService.registerClient(
+      response,
+      clientId,
+      'games',
+    );
+    // Configure SSE
+    this.configureSSE(response, unsubscribe);
+    //return this.requestHandlerService.getAllGames(page, pageSize);
   }
 
   @Get('/games/:id')
-  getGameById(@Query('id', ParseIntPipe) id: number): Promise<ApiResponse> {
-    return this.requestHandlerService.getGameById(id);
+  async getGameById(
+    @Query('id', ParseIntPipe) id: number,
+    @Res() response: Response,
+  ) {
+    //Use SSE to send updates to the client
+    const clientId = uuid4();
+
+    //Initiate the get game by id service
+    await this.requestHandlerService.getGameById(id, clientId);
+
+    // Register the client to receive updates
+    const unsubscribe = this.requestHandlerService.registerClient(
+      response,
+      clientId,
+      `games/${id}`,
+    );
+
+    // Configure SSE
+    this.configureSSE(response, unsubscribe);
   }
 
   @Get('/games/:id/articles/:timestamp')
-  getGameArticlesById(
+  async getGameArticlesById(
     @Query('id', ParseIntPipe) id: number,
     @Query('timestamp', ParseIntPipe) timestamp: number,
-  ): Promise<ApiResponse> {
-    return this.requestHandlerService.getGameArticlesById(id, timestamp);
+    @Res() response: Response,
+  ) {
+    //Use SSE to send updates to the client
+    const clientId = uuid4();
+
+    //Initiate the get game articles by id service
+    await this.requestHandlerService.getGameArticlesById(
+      id,
+      timestamp,
+      clientId,
+    );
+
+    // Register the client to receive updates
+    const unsubscribe = this.requestHandlerService.registerClient(
+      response,
+      clientId,
+      `games/${id}/articles/${timestamp}`,
+    );
+    // Configure SSE
+    this.configureSSE(response, unsubscribe);
   }
+
+  configureSSE = (response: Response, unsubscribe) => {
+    // Set the headers to indicate this is an SSE connection
+    response.set({
+      'Cache-Control':
+        'private, no-cache, no-store, must-revalidate, max-age=0, no-transform',
+      Connection: 'keep-alive',
+      'Content-Type': 'text/event-stream',
+    });
+
+    // Flusing the headers will establish the connection
+    response.flushHeaders();
+
+    // Close the connection when the client disconnects
+    response.on('close', () => {
+      unsubscribe();
+    });
+  };
 }

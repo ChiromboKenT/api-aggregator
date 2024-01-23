@@ -6,6 +6,7 @@ import { Events } from '@aggregator/events/events';
 import { DbManagerService } from '@aggregator/db-manager';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { Error } from '@aggregator/common-types/error';
+import { SseManagerService } from '@aggregator/sse-manager';
 
 @Injectable()
 export class Listener {
@@ -14,6 +15,7 @@ export class Listener {
     @Inject(SqsManagerService)
     private readonly sqsManagerService: SqsManagerService,
     private readonly logger: LoggerService,
+    private readonly sseHandlerService: SseManagerService,
     @Inject(EventsService) private readonly eventBus: EventsService,
     @Inject(DbManagerService) private readonly dbClient: DbManagerService,
   ) {
@@ -22,25 +24,58 @@ export class Listener {
   async start() {
     this.logger.debug('Start listening on queue... ');
 
-    for await (const { body, ack } of this.sqsManagerService.listen<any>()) {
+    for await (const {
+      body,
+      attributes,
+      ack,
+    } of this.sqsManagerService.listen<any>()) {
       this.logger.debug('Received message', { body });
-      const requestId = body.requestId;
-      const params = {
-        TableName: '',
-        Key: {
-          PK: `REQUEST#${requestId}`,
-          SK: 'COMBINED',
-        },
-      };
 
-      let result = await this.dbClient.getItem(params);
-      this.logger.debug('Result', { result });
+      switch (attributes.EVENT) {
+        case Events.API_AGGREGATED:
+          const requestId = body.requestId;
+          const params = {
+            TableName: '',
+            Key: {
+              PK: `REQUEST#${requestId}`,
+              SK: 'COMBINED',
+            },
+          };
+
+          const result = await this.dbClient.getItem(params);
+          this.logger.debug('Result', { result });
+
+          //send result to client
+          this.sendResultToClient(
+            body.clientId,
+            'games/:id/articles/:timestamp',
+            result,
+          );
+          break;
+
+        case Events.API_REQUEST_COMPLETED:
+          this.logger.debug('Request completed', { requestId: body.requestId });
+          this.sendResultToClient(body.clientId, 'games/:id', body.payload);
+          break;
+
+        default:
+          break;
+      }
 
       await ack();
     }
+
     this.logger.debug('Message processed');
   }
 
+  async sendResultToClient(clientId, endpoint: string, payload: any) {
+    try {
+      this.sseHandlerService.sendUpdate(clientId, endpoint, payload);
+      this.sseHandlerService.sendUpdate(clientId, endpoint, 'DONE');
+    } catch (error) {
+      this.logger.error(`Error sending result to client:`, error);
+    }
+  }
   async getCombinedData(requestId: string): Promise<any[]> {
     this.logger.info(`Getting combined data`);
     const params: DocumentClient.QueryInput = {
