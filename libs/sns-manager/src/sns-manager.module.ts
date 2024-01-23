@@ -19,7 +19,7 @@ export class SnsManagerModule {
         LoggerModule,
         AwsSdkModule.forRoot({
           defaultServiceOptions: {
-            region: (process.env.REGION as awsRegion) || 'eu-central-1',
+            region: (process.env.REGION as awsRegion) || 'us-east-1',
             endpoint: process.env.SNS_ENDPOINT,
           },
           services: [SNS],

@@ -9,7 +9,7 @@ services:
     environment:
       - SERVICES=sns,sqs,dynamodb
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - DEFAULT_REGION=eu-central-1
+      - DEFAULT_REGION=us-east-1
     volumes:
       - ~/tmp/localstack:/tmp/localstack
       - /var/run/docker.sock:/var/run/docker.sock

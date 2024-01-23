@@ -30,8 +30,8 @@ EOT
 aws --endpoint-url=${LOCALSTACK} dynamodb create-table --cli-input-json "${SETTINGS}"
 
 echo "Creating SQS subscription for SNS topic: ${SERVICE_NAME}"
-TOPIC_ARN=arn:aws:sns:eu-central-1:000000000000:${TOPIC_NAME}
-QUEUE_ARN=arn:aws:sqs:eu-central-1:000000000000:${SERVICE_NAME}
+TOPIC_ARN=arn:aws:sns:us-east-1:000000000000:${TOPIC_NAME}
+QUEUE_ARN=arn:aws:sqs:us-east-1:000000000000:${SERVICE_NAME}
 SUBSCRIPTION_ARN=$(aws --endpoint-url=${LOCALSTACK} sns subscribe --topic-arn ${TOPIC_ARN} --protocol sqs --notification-endpoint ${QUEUE_ARN} --output text)
 
 aws --endpoint-url=${LOCALSTACK} sns set-subscription-attributes --subscription-arn ${SUBSCRIPTION_ARN} --attribute-name RawMessageDelivery --attribute-value true

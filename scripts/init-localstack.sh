@@ -6,7 +6,7 @@ SQS_ENDPOINT="http://${LOCALSTACK}:4566"
 cat <<EOF >> /root/.aws/config
 [default]
 output = json
-region = eu-central-1
+region = us-east-1
 EOF
 
 cat <<EOF >> ~/.aws/credentials

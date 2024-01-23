@@ -18,7 +18,7 @@ export class SqsManagerModule {
         LoggerModule,
         AwsSdkModule.forRoot({
           defaultServiceOptions: {
-            region: (process.env.REGION as awsRegion) || 'eu-central-1',
+            region: (process.env.REGION as awsRegion) || 'us-east-1',
           },
           services: [SQS],
         }),

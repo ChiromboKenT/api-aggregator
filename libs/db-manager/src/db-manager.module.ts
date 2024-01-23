@@ -15,7 +15,7 @@ import { DynamoDB } from 'aws-sdk';
       defaultServiceOptions: {
         useFactory: (config: ConfigService) => {
           return {
-            region: config.get<awsRegion>('AWS_REGION') || 'eu-central-1',
+            region: config.get<awsRegion>('AWS_REGION') || 'us-east-1',
             endpoint: config.get<string>('DYNAMODB_ENDPOINT'),
           };
         },
