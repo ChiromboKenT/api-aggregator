@@ -49,7 +49,7 @@ export class RequestHandlerService {
 
     try {
       this.logger.debug(`Sending event to external api handler : ${cacheId}`);
-      this.triggerExternalApi(cacheId, 'ALL', {
+      this.triggerExternalApi(cacheId, 'nba', {
         page,
         pageSize,
         clientId,
@@ -73,7 +73,7 @@ export class RequestHandlerService {
 
     try {
       this.logger.debug(`Sending event to aggregator : ${cacheId}`);
-      this.triggerExternalApi(cacheId, 'SINGLE', {
+      this.triggerExternalApi(cacheId, 'nba', {
         gameId: id,
         clientId,
         requestType: 'SINGLE',

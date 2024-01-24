@@ -80,7 +80,7 @@ export class NbaService implements Action {
   async fetchGameById(gameId: string): Promise<any> {
     const options = {
       method: 'GET',
-      url: `${this.config.get('RAPID_API_HOST_NBA')}/games/${gameId}`,
+      url: `https://${this.config.get('RAPID_API_HOST_NBA')}/games/${gameId}`,
       params: {},
       headers: {
         'X-RapidAPI-Key': this.config.get('RAPID_API_KEY'),

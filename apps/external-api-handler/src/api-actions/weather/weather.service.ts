@@ -31,10 +31,11 @@ export class WeatherService implements Action {
     }
   }
 
-  async fetchData(date: string, location: string): Promise<any> {
+  async fetchData(timestamp: string, location: string): Promise<any> {
+    const date = new Date(timestamp).toISOString();
     const options = {
       method: 'GET',
-      url: `${this.config.get('RAPID_API_URL')}/weather/historical/${date}`,
+      url: `https://${this.config.get('RAPID_API_HOST_WEATHER')}/weather/historical/${date}`,
       params: {
         startDateTime: date,
         aggregateHours: '24',
@@ -46,7 +47,7 @@ export class WeatherService implements Action {
       },
       headers: {
         'X-RapidAPI-Key': `${this.config.get('RAPID_API_KEY')}`,
-        'X-RapidAPI-Host': `${this.config.get('RAPID_API_HOST')}`,
+        'X-RapidAPI-Host': `${this.config.get('RAPID_API_HOST_WEATHER')}`,
       },
     };
 
