@@ -123,6 +123,36 @@ services:
     networks:
       - api-aggregator
 
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - request-handler
+      - aggregator-core
+      - broadcaster
+      - external-api
+    networks:
+      - api-aggregator
+
+  nginx:
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - localstack
+      - localstack-setup
+      - client
+      - request-handler
+    tty: true
+    ports:
+      - 8080:80
+    networks:
+      - api-aggregator
+
 networks:
   api-aggregator:
     driver: "bridge"

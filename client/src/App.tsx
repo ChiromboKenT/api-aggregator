@@ -4,7 +4,6 @@ import { Heading, Text, Box, Flex, Button, Textarea } from '@chakra-ui/react';
 
 import './App.css';
 
-const baseURl = 'https://api.openai.com/v1';
 
 const App: React.FC = () => {
   const [prompt, setPrompt] = useState<string>('');
@@ -17,14 +16,13 @@ const App: React.FC = () => {
 
   const resultRef = useRef<string | undefined>();
 
-   useEffect(() => {
+  useEffect(() => {
     const newColors = [
       '#' + Math.floor(Math.random() * 16777215).toString(16),
       '#' + Math.floor(Math.random() * 16777215).toString(16),
     ];
     setBackgroundColors(newColors);
-
-   }, []);
+  }, []);
 
   useEffect(() => {
     resultRef.current = result;
@@ -39,16 +37,13 @@ const App: React.FC = () => {
       setIsLoading(true);
       setResult('');
 
-
       const headers = {
         'Content-Type': 'application/json',
-
       };
 
-      const source = new SSE(baseURl, {
+      const source = new SSE(prompt, {
         headers,
         method: SSEOptionsMethod.GET,
-
       });
 
       source.addEventListener('message', (event: CustomEventType) => {
@@ -65,7 +60,7 @@ const App: React.FC = () => {
         }
       });
 
-      source.addEventListener('readystatechange', (event : CustomEventType) => {
+      source.addEventListener('readystatechange', (event: CustomEventType) => {
         const dataEvent = event as CustomEventReadyStateChangeType;
         if (dataEvent.readyState >= 2) {
           setIsLoading(false);
@@ -78,14 +73,14 @@ const App: React.FC = () => {
     }
   };
 
-
   return (
     <Flex
       width="100vw"
       height="100vh"
       alignContent="center"
       justifyContent="center"
-      transition="background 3s ease-in-out" bgGradient={`linear(to-l, ${backgroundColors[0]}, ${backgroundColors[1]})`}
+      transition="background 3s ease-in-out"
+      bgGradient={`linear(to-l, ${backgroundColors[0]}, ${backgroundColors[1]})`}
     >
       <Box maxW="2xl" m="0 auto" p="20px">
         <Heading
