@@ -89,9 +89,9 @@ export class RequestHandlerService {
         request: {
           page,
           pageSize,
+          requestType: 'ALL',
         },
         clientId,
-        requestType: 'ALL',
       });
     } catch (error) {
       this.logger.error(error);
@@ -114,9 +114,9 @@ export class RequestHandlerService {
       this.triggerExternalApi(cacheId, 'nba', {
         request: {
           gameId: id,
+          requestType: 'SINGLE',
         },
         clientId,
-        requestType: 'SINGLE',
       });
     } catch (error) {
       this.logger.error(error);

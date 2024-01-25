@@ -53,7 +53,7 @@ Example Endpoints
 ```
 - Get Aggregated data - Game Article /games/:id/articles/:timestamp
 ```bash
-  curl -X GET "http://localhost:6010/api/v1/sse/games/20/1546293600
+  curl -X GET "http://localhost:6010/api/v1/sse/games/20/1579970896000
 ```
 
 Can import postman colloection into Postman client
