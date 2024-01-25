@@ -17,8 +17,11 @@ export class UniqueIdGeneratorService {
     return this.generateHashedId(`game-${gameId}`);
   }
 
-  generateGameArticleId(gameId: string | number, gameDate: string): string {
-    return this.generateHashedId(`all-games-${gameId}-${gameDate}`);
+  generateGameArticleId(
+    gameId: string | number,
+    gameTimestamp: number,
+  ): string {
+    return this.generateHashedId(`all-games-${gameId}-${gameTimestamp}`);
   }
 
   guid() {

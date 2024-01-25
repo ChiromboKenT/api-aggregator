@@ -31,10 +31,17 @@ export class LoggerService {
     this.log('ERROR', message, data);
   }
   private log(logLevel: LogLevels, message: string, data: unknown) {
-    console.log(logLevel, {
-      ...this.logger,
-      message,
-      details: data as logDetails,
-    });
+    console.log(
+      logLevel,
+      JSON.stringify(
+        {
+          ...this.logger,
+          message,
+          details: data as logDetails,
+        },
+        null,
+        2,
+      ),
+    );
   }
 }

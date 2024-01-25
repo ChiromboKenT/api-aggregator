@@ -20,8 +20,8 @@ export class Listener {
     for await (const { body, ack } of this.sqsManagerService.listen<any>()) {
       this.logger.debug('Received message', { body });
 
-      const { actionType, payload } = body;
-      await this.appService.saveEventToDynamoDB(payload);
+      const actionType = body.actionType;
+      await this.appService.saveEventToDynamoDB(body);
 
       const completion = await this.appService.checkCompletion(body.requestId);
 

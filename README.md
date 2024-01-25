@@ -15,10 +15,27 @@ To spin up the backend containers use the following command from the project roo
 ```bash
 docker-compose up
 ```
+Wait for services to start and local resources to be created
 
 Verify the deployment by navigating to your server address in
 your preferred browseror use postman.
 
+View frontend client
+```
+https://localhost:80
+
+```
+To use client paste a relative path into the dialog eg:
+Fetch Games
+```bash
+/games?page=1&pageSize=10
+```
+Fetch Game Article (Augmented game data)
+```bash
+/games/20/articles/1546293600
+```
+
+To Access Backend API - Directly
 ```bash
 https://localhost:6010
 ```
@@ -41,7 +58,7 @@ Example Endpoints
 
 To spin up the react front end use the following
 ```bash
-cd client && npm start
+cd client && npm run dev
 ```
 
 ## Stay in touch

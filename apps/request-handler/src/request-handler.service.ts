@@ -91,7 +91,7 @@ export class RequestHandlerService {
     //Retieve game articles from cache, otherwise aggregate data
     const cacheId = this.uniqueIdGeneratorService.generateGameArticleId(
       id,
-      timestamp.toString(),
+      timestamp,
     );
 
     const cachedGameArticles = await this.cacheManagerService.get(cacheId);

@@ -1,4 +1,13 @@
-import { Controller, Get, ParseIntPipe, Query, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { RequestHandlerService } from './request-handler.service';
 import { ApiResponse } from './request.dto';
 import { Response } from 'express';
@@ -27,13 +36,13 @@ export class RequestHandlerController {
       'games',
     );
     // Configure SSE
-    this.configureSSE(response, unsubscribe);
+    this.configureSSE(response, unsubscribe, 'games');
     //return this.requestHandlerService.getAllGames(page, pageSize);
   }
 
   @Get('/games/:id')
   async getGameById(
-    @Query('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Res() response: Response,
   ) {
     //Use SSE to send updates to the client
@@ -50,13 +59,13 @@ export class RequestHandlerController {
     );
 
     // Configure SSE
-    this.configureSSE(response, unsubscribe);
+    this.configureSSE(response, unsubscribe, `games/${id}`);
   }
 
   @Get('/games/:id/articles/:timestamp')
   async getGameArticlesById(
-    @Query('id', ParseIntPipe) id: number,
-    @Query('timestamp', ParseIntPipe) timestamp: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('timestamp', ParseIntPipe) timestamp: number,
     @Res() response: Response,
   ) {
     //Use SSE to send updates to the client
@@ -76,10 +85,14 @@ export class RequestHandlerController {
       `games/${id}/articles/${timestamp}`,
     );
     // Configure SSE
-    this.configureSSE(response, unsubscribe);
+    this.configureSSE(
+      response,
+      unsubscribe,
+      `games/${id}/articles/${timestamp}`,
+    );
   }
 
-  configureSSE = (response: Response, unsubscribe) => {
+  configureSSE = (response: Response, unsubscribe, url: string) => {
     // Set the headers to indicate this is an SSE connection
     response.set({
       'Cache-Control':
@@ -90,6 +103,17 @@ export class RequestHandlerController {
 
     // Flusing the headers will establish the connection
     response.flushHeaders();
+
+    response.on('DONE', (data: any) => {
+      unsubscribe();
+      //Close the connection when the client disconnects
+      response.end(
+        JSON.stringify({
+          data,
+          message: 'Successfully retrieved: ' + url,
+        }),
+      );
+    });
 
     // Close the connection when the client disconnects
     response.on('close', () => {

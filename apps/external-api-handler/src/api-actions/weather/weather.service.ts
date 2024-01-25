@@ -15,8 +15,8 @@ export class WeatherService implements Action {
   ) {}
 
   async run(body: any): Promise<void> {
-    const { requestId, date, location, ...payload } = body;
-    const response = await this.fetchData(date, location);
+    const { requestId, payload } = body;
+    const response = await this.fetchData(payload.timestamp, payload.location);
 
     if (response) {
       await this.eventBus.sendEvent(
@@ -24,18 +24,18 @@ export class WeatherService implements Action {
           requestId,
           actionType: 'weather',
           serviceName: 'WEATHER_SERVICE',
-          ...{ date, location, ...payload },
+          payload: response,
         },
         Events.API_RESOLVED,
       );
     }
   }
 
-  async fetchData(timestamp: string, location: string): Promise<any> {
+  async fetchData(timestamp: number, location: string = 'Johannesburg'): Promise<any> {
     const date = new Date(timestamp).toISOString();
     const options = {
       method: 'GET',
-      url: `https://${this.config.get('RAPID_API_HOST_WEATHER')}/weather/historical/${date}`,
+      url: `https://${this.config.get('RAPID_API_HOST_WEATHER')}/history`,
       params: {
         startDateTime: date,
         aggregateHours: '24',

@@ -18,16 +18,16 @@ export class NbaService implements Action {
   ) {}
 
   async run(body: any): Promise<void> {
-    const { requestId, ...payload } = body;
+    const { requestId, payload } = body;
     const response = await this.fetchGameById(payload.gameId);
     if (response) {
-      await this.cacheManager.set(requestId, response.data);
+      await this.cacheManager.set(requestId, response);
       await this.eventBus.sendEvent(
         {
           requestId,
           actionType: 'nba',
           serviceName: 'NBA_SERVICE',
-          payload,
+          payload: response,
         },
         Events.API_RESOLVED,
       );
@@ -39,14 +39,14 @@ export class NbaService implements Action {
     const { clientId, page, pageSize } = body.payload;
     const response = await this.fetchAllGames(page, pageSize);
     if (response) {
-      await this.cacheManager.set(requestId, response.data);
+      await this.cacheManager.set(requestId, response);
       await await this.eventBus.sendEvent(
         {
           requestId,
           clientId,
           actionType: 'nba',
           serviceName: 'NBA_SERVICE',
-          payload: response.data,
+          payload: response,
         },
         Events.API_REQUEST_COMPLETED,
       );
@@ -91,6 +91,7 @@ export class NbaService implements Action {
     try {
       this.logger.info(`Fetching game by ID ${gameId} from ${options.url}`);
       const response = await axios(options);
+      this.logger.debug(`Successfully fetched data: `, response);
       return response.data;
     } catch (error) {
       this.logger.error(
@@ -123,6 +124,7 @@ export class NbaService implements Action {
         `Fetching all games (Page: ${page}, PageSize: ${pageSize}) from ${options.url}`,
       );
       const response = await axios(options);
+       this.logger.debug(`Successfully fetched data: `, response);
       return response.data;
     } catch (error) {
       this.logger.error(
