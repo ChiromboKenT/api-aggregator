@@ -33,15 +33,11 @@ export class LoggerService {
   private log(logLevel: LogLevels, message: string, data: unknown) {
     console.log(
       logLevel,
-      JSON.stringify(
-        {
-          ...this.logger,
-          message,
-          details: data as logDetails,
-        },
-        null,
-        2,
-      ),
+      JSON.stringify({
+        ...this.logger,
+        message,
+        details: data as logDetails,
+      }),
     );
   }
 }

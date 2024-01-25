@@ -53,7 +53,6 @@ export class WeatherService implements Action {
 
     try {
       const response = await axios(options);
-      this.logger.info(response.data);
       return response.data;
     } catch (error) {
       this.logger.error(error);

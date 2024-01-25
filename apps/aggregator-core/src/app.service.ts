@@ -33,6 +33,26 @@ export class AggregatorCoreService {
       this.logger.info(`Saving event to DynamoDB`);
       await this.dbClient.putItem(params);
       this.logger.debug(`Event saved to DynamoDB`);
+
+      this.logger.debug(`Updating tracking item - ${serviceName}`);
+
+      const trackingParams: DocumentClient.UpdateItemInput = {
+        TableName: this.tableName,
+        Key: {
+          PK: `REQUEST#${requestId}`,
+          SK: 'TRACKING',
+        },
+        UpdateExpression: 'SET #serviceName = :serviceName',
+        ExpressionAttributeNames: {
+          '#serviceName': serviceName,
+        },
+        ExpressionAttributeValues: {
+          ':serviceName': true,
+        },
+      };
+
+      await this.dbClient.updateItem(trackingParams);
+      this.logger.debug(`Tracking item updated - ${serviceName}`);
     } catch (error) {
       this.logger.error(`Failed to save event to DynamoDB`, error);
       throw error;
@@ -51,18 +71,19 @@ export class AggregatorCoreService {
 
     try {
       const result = await this.dbClient.getItem(params);
+      this.logger.debug(`Fetched tracking information`, result);
       if (result.error) {
         throw new Error(`Failed to get item from DynamoDB : ${result.error}`);
       }
 
       const isNBAComplete =
-        (result as DocumentClient.AttributeMap).Item?.nba === true;
+        result['NBA_SERVICE'] === true;
       const isWeatherComplete =
-        (result as DocumentClient.AttributeMap).Item?.weather === true;
+        result['WEATHER_SERVICE'] === true;
 
       return isNBAComplete && isWeatherComplete;
     } catch (error) {
-      this.logger.error(`Failed to check completion`, error);
+      this.logger.trace(`Failed to check completion`, error);
       return false;
     }
   }
