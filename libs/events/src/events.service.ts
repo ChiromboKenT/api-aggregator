@@ -4,6 +4,25 @@ import { SnsManagerService } from '@aggregator/sns-manager';
 import { LoggerService } from '@aggregator/logger';
 import { v4 as uuid4 } from 'uuid';
 
+
+export interface RequestPayload<P = any> {
+  clientId: string;
+  request?: P;
+  requestType?: 'ALL' | 'SINGLE' | 'FULL';
+}
+export interface MessagePayload<P = any> {
+  data: P;
+  clientId: string;
+  message?: string;
+  endpoint?: string;
+}
+export interface SNSMessage<P = any> {
+  requestId: string;
+  actionType: string;
+  serviceName: string;
+  payload: MessagePayload<P> | RequestPayload<P>;
+}
+
 @Injectable()
 export class EventsService {
   constructor(
@@ -11,8 +30,8 @@ export class EventsService {
     @Inject(LoggerService) private readonly logger: LoggerService,
   ) {}
 
-  async sendEvent(
-    message,
+  async sendEvent<P = any>(
+    message: SNSMessage<P>,
     eventType: EventType,
     attributes?: EventAttributes,
   ): Promise<void> {
@@ -30,7 +49,7 @@ export class EventsService {
     );
 
     try {
-      await this.sns.send(message, messageAttributes);
+      await this.sns.send({ ...message }, messageAttributes);
     } catch (error) {
       this.logger.error(error);
       throw error;

@@ -3,7 +3,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Action } from '../types';
-import { EventsService } from '@aggregator/events';
+import { EventsService, RequestPayload, SNSMessage } from '@aggregator/events';
 import { Events } from '@aggregator/events/events';
 import { CacheManagerService } from '@aggregator/cache-manager';
 
@@ -17,9 +17,11 @@ export class NbaService implements Action {
     @Inject(EventsService) private readonly eventBus: EventsService,
   ) {}
 
-  async run(body: any): Promise<void> {
-    const { requestId, payload } = body;
-    const response = await this.fetchGameById(payload.gameId);
+  async run(body: SNSMessage): Promise<void> {
+    const requestId = body.requestId;
+    const { request, clientId } = body.payload as RequestPayload;
+
+    const response = await this.fetchGameById(request.gameId);
     if (response) {
       await this.cacheManager.set(requestId, response);
       await this.eventBus.sendEvent(
@@ -27,45 +29,51 @@ export class NbaService implements Action {
           requestId,
           actionType: 'nba',
           serviceName: 'NBA_SERVICE',
-          payload: response,
+          payload: { data: response, clientId },
         },
         Events.API_RESOLVED,
       );
     }
   }
 
-  async handleGetAllGames(body: any): Promise<void> {
-    const { requestId } = body;
-    const { clientId, page, pageSize } = body.payload;
-    const response = await this.fetchAllGames(page, pageSize);
+  async handleGetAllGames(body: SNSMessage): Promise<void> {
+    const requestId = body.requestId;
+    const { request, clientId } = body.payload as RequestPayload;
+
+    const response = await this.fetchAllGames(request.page, request.pageSize);
     if (response) {
       await this.cacheManager.set(requestId, response);
       await await this.eventBus.sendEvent(
         {
           requestId,
-          clientId,
           actionType: 'nba',
           serviceName: 'NBA_SERVICE',
-          payload: response,
+          payload: {
+            data: response,
+            clientId,
+          },
         },
         Events.API_REQUEST_COMPLETED,
       );
     }
   }
 
-  async handleGetGameById(body: any): Promise<void> {
-    const { requestId } = body;
-    const { gameId, clientId } = body.payload;
-    const response = await this.fetchGameById(gameId);
+  async handleGetGameById(body: SNSMessage): Promise<void> {
+    const requestId = body.requestId;
+    const { request, clientId } = body.payload as RequestPayload;
+
+    const response = await this.fetchGameById(request.gameId);
     if (response) {
       await this.cacheManager.set(requestId, response);
       await this.eventBus.sendEvent(
         {
           requestId,
-          clientId,
           actionType: 'nba',
           serviceName: 'NBA_SERVICE',
-          payload: response,
+          payload: {
+            data: response,
+            clientId,
+          },
         },
         Events.API_REQUEST_COMPLETED,
       );

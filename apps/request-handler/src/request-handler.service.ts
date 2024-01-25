@@ -9,7 +9,12 @@ import {
 } from './request.dto';
 import { UniqueIdGeneratorService } from '@aggregator/unique-id-generator';
 import { CacheManagerService } from '@aggregator/cache-manager';
-import { EventsService } from '@aggregator/events';
+import {
+  EventsService,
+  MessagePayload,
+  RequestPayload,
+  SNSMessage,
+} from '@aggregator/events';
 import { Events } from '@aggregator/events/events';
 import { Subscription } from 'rxjs';
 import { LoggerService } from '@aggregator/logger';
@@ -33,12 +38,29 @@ export class RequestHandlerService {
   ) {}
 
   async start() {
-    for await (const { body, ack } of this.sqsManagerService.listen<any>()) {
+    for await (const {
+      body,
+      ack,
+    } of this.sqsManagerService.listen<SNSMessage>()) {
       this.logger.debug('Received message', { body });
-      const { payload, serviceName } = body;
+      const serviceName = body.serviceName;
+      const payload = body.payload as MessagePayload;
 
-      if (serviceName === 'BROADCASTER_SERVICE')
-        this.sendResultToClient(payload);
+      if (serviceName === 'BROADCASTER_SERVICE') {
+        //Send result to client
+        this.logger.debug(`Sending result to client: ${payload.message}`);
+        this.sseHandlerService.sendUpdate(
+          payload.endpoint,
+          payload.clientId,
+          payload.data,
+        );
+
+        this.sseHandlerService.sendUpdate(
+          payload.endpoint,
+          payload.clientId,
+          'DONE',
+        );
+      }
 
       await ack();
     }
@@ -65,8 +87,10 @@ export class RequestHandlerService {
     try {
       this.logger.debug(`Sending event to external api handler : ${cacheId}`);
       this.triggerExternalApi(cacheId, 'nba', {
-        page,
-        pageSize,
+        request: {
+          page,
+          pageSize,
+        },
         clientId,
         requestType: 'ALL',
       });
@@ -89,7 +113,9 @@ export class RequestHandlerService {
     try {
       this.logger.debug(`Sending event to aggregator : ${cacheId}`);
       this.triggerExternalApi(cacheId, 'nba', {
-        gameId: id,
+        request: {
+          gameId: id,
+        },
         clientId,
         requestType: 'SINGLE',
       });
@@ -102,11 +128,13 @@ export class RequestHandlerService {
     id: number,
     timestamp: number,
     clientId: string,
+    gameLocation: string,
   ): Promise<ApiResponse> {
     //Retieve game articles from cache, otherwise aggregate data
     const cacheId = this.uniqueIdGeneratorService.generateGameArticleId(
       id,
       timestamp,
+      gameLocation,
     );
 
     const cachedGameArticles = await this.cacheManagerService.get(cacheId);
@@ -127,13 +155,11 @@ export class RequestHandlerService {
 
     //Aggregate data
     await this.triggerAggregatorEvent(cacheId, 'nba', {
-      gameId: id,
-      timestamp,
+      request: { gameId: id, timestamp, gameLocation },
       clientId,
     });
     await this.triggerAggregatorEvent(cacheId, 'weather', {
-      gameId: id,
-      timestamp,
+      request: { gameId: id, timestamp, gameLocation },
       clientId,
     });
 
@@ -146,7 +172,7 @@ export class RequestHandlerService {
   private async triggerExternalApi(
     cacheId: string,
     actionType: string,
-    payload: any,
+    payload: RequestPayload,
   ) {
     await this.eventBus.sendEvent(
       {
@@ -162,7 +188,7 @@ export class RequestHandlerService {
   private async triggerAggregatorEvent(
     cacheId: string,
     actionType: string,
-    payload: any,
+    payload: RequestPayload,
   ): Promise<void> {
     await this.eventBus.sendEvent(
       {
@@ -206,17 +232,6 @@ export class RequestHandlerService {
     };
 
     return unsubscribe;
-  }
-
-  sendResultToClient(payload: any) {
-    const { clientId, endpoint, data } = payload;
-    try {
-      this.logger.debug(`Sending final result to client`);
-      this.sseHandlerService.sendUpdate(clientId, endpoint, data);
-      this.sseHandlerService.sendUpdate(clientId, endpoint, 'DONE');
-    } catch (error) {
-      this.logger.error(`Error sending result to client:`, error);
-    }
   }
 }
 

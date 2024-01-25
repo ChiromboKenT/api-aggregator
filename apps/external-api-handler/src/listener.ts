@@ -3,6 +3,7 @@ import { SqsManagerService } from '@aggregator/sqs-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { ActionsDictionary } from './api-actions/actions-dictionary';
 import { Events } from '@aggregator/events/events';
+import { RequestPayload, SNSMessage } from '@aggregator/events';
 
 @Injectable()
 export class Listener {
@@ -16,14 +17,14 @@ export class Listener {
   async start() {
     this.logger.debug('Start listening on queue... ');
 
-    for await (const {
-      body,
-      attributes,
-      ack,
-    } of this.sqsManagerService.listen<any>()) {
+    for await (const { body, attributes, ack } of this.sqsManagerService.listen<
+      SNSMessage<any>
+    >()) {
       this.logger.debug('Received message', { body });
 
-      const { actionType, payload } = body;
+      const actionType = body.actionType;
+      const payload = body.payload as RequestPayload;
+
       const app = this.actionsDictionary.get(actionType);
 
       switch (attributes.EVENT) {
@@ -37,7 +38,7 @@ export class Listener {
           break;
         case Events.API_REQUESTED:
           try {
-            if (payload.requestType === 'ALL') {
+            if (payload.request.requestType === 'ALL') {
               await app.handleGetAllGames(body);
             } else {
               await app.handleGetGameById(body);

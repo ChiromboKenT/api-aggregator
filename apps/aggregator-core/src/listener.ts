@@ -2,7 +2,7 @@ import { LoggerService } from '@aggregator/logger';
 import { SqsManagerService } from '@aggregator/sqs-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { AggregatorCoreService } from './app.service';
-import { EventsService } from '@aggregator/events';
+import { EventsService, SNSMessage } from '@aggregator/events';
 import { Events } from '@aggregator/events/events';
 
 @Injectable()
@@ -17,10 +17,13 @@ export class Listener {
   async start() {
     this.logger.debug('Start listening on queue... ');
 
-    for await (const { body, ack } of this.sqsManagerService.listen<any>()) {
+    for await (const {
+      body,
+      ack,
+    } of this.sqsManagerService.listen<SNSMessage>()) {
       this.logger.debug('Received message', { body });
 
-      const { actionType, requestId } = body;
+      const { actionType, requestId, payload } = body;
 
       await this.appService.saveEventToDynamoDB(body);
 
@@ -34,6 +37,11 @@ export class Listener {
             requestId,
             actionType: 'aggregated',
             serviceName: 'AGGREGATOR_SERVICE  ',
+            payload: {
+              message: 'Request Aggregated',
+              data: {},
+              clientId: payload.clientId,
+            },
           },
           Events.API_AGGREGATED,
         );

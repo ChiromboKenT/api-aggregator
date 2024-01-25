@@ -20,8 +20,11 @@ export class UniqueIdGeneratorService {
   generateGameArticleId(
     gameId: string | number,
     gameTimestamp: number,
+    location: string,
   ): string {
-    return this.generateHashedId(`all-games-${gameId}-${gameTimestamp}`);
+    return this.generateHashedId(
+      `all-games-${gameId}-${location}-${gameTimestamp}`,
+    );
   }
 
   guid() {

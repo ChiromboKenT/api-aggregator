@@ -66,6 +66,7 @@ export class RequestHandlerController {
   async getGameArticlesById(
     @Param('id', ParseIntPipe) id: number,
     @Param('timestamp', ParseIntPipe) timestamp: number,
+    @Query('location') location: string,
     @Res() response: Response,
   ) {
     //Use SSE to send updates to the client
@@ -76,6 +77,7 @@ export class RequestHandlerController {
       id,
       timestamp,
       clientId,
+      location,
     );
 
     // Register the client to receive updates

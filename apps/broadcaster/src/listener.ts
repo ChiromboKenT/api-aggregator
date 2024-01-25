@@ -1,12 +1,11 @@
 import { LoggerService } from '@aggregator/logger';
 import { SqsManagerService } from '@aggregator/sqs-manager';
 import { Inject, Injectable } from '@nestjs/common';
-import { EventsService } from '@aggregator/events';
+import { EventsService, MessagePayload, SNSMessage } from '@aggregator/events';
 import { Events } from '@aggregator/events/events';
 import { DbManagerService } from '@aggregator/db-manager';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { Error } from '@aggregator/common-types/error';
-import { SseManagerService } from '@aggregator/sse-manager';
 
 @Injectable()
 export class Listener {
@@ -27,28 +26,32 @@ export class Listener {
       body,
       attributes,
       ack,
-    } of this.sqsManagerService.listen<any>()) {
+    } of this.sqsManagerService.listen<SNSMessage>()) {
       this.logger.debug('Received message', { body });
 
       switch (attributes.EVENT) {
         case Events.API_AGGREGATED:
-          const { requestId, clientId, payload } = body.requestId;
+          const { requestId, payload } = body;
 
+          const clientId = payload?.clientId || '';
           const combinedData = await this.getCombinedData(requestId);
           this.logger.debug('Result', { combinedData });
 
           //send result to client
-          this.sendResultToClient(
-            requestId,
+          this.sendResultToClient(requestId, {
             clientId,
-            'games/:id/articles/:timestamp',
-            combinedData,
-          );
+            endpoint: 'games/:id/articles/:timestamp',
+            data: combinedData,
+          });
           break;
 
         case Events.API_REQUEST_COMPLETED:
           this.logger.debug('Request completed', { requestId });
-          this.sendResultToClient(requestId, clientId, 'games/:id', payload);
+          this.sendResultToClient(requestId, {
+            clientId,
+            endpoint: 'games/:id',
+            data: (payload as MessagePayload).data,
+          });
           break;
 
         default:
@@ -61,12 +64,7 @@ export class Listener {
     this.logger.debug('Message processed');
   }
 
-  async sendResultToClient(
-    requestId,
-    clientId,
-    endpoint: string,
-    payload: any,
-  ) {
+  async sendResultToClient(requestId, payload: any) {
     try {
       this.logger.debug(`Sending result to client`);
       this.eventBus.sendEvent(
@@ -74,12 +72,7 @@ export class Listener {
           requestId,
           actionType: 'aggregated',
           serviceName: 'BROADCASTER_SERVICE',
-          payload: {
-            data: payload,
-            message: `Retrieved data for ${endpoint}`,
-            clientId,
-            endpoint,
-          },
+          payload,
         },
         Events.AGGREGATOR_COMPLETED,
       );
@@ -101,6 +94,7 @@ export class Listener {
 
     try {
       const result = await this.dbClient.queryItems(params);
+      this.logger.debug(`Result for combined data`, { result });
       if ((result as Error).error) {
         this.logger.error(
           `Error getting combined data: ${(result as Error).message}`,

@@ -3,7 +3,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Action } from '../types';
-import { EventsService } from '@aggregator/events';
+import { EventsService, RequestPayload, SNSMessage } from '@aggregator/events';
 import { Events } from '@aggregator/events/events';
 
 @Injectable()
@@ -14,9 +14,14 @@ export class WeatherService implements Action {
     @Inject(EventsService) private readonly eventBus: EventsService,
   ) {}
 
-  async run(body: any): Promise<void> {
-    const { requestId, payload } = body;
-    const response = await this.fetchData(payload.timestamp, payload.location);
+  async run(body: SNSMessage): Promise<void> {
+    const requestId = body.requestId;
+    const { clientId, request } = body.payload as RequestPayload;
+
+    const response = await this.fetchData(
+      request.timestamp,
+      request.gameLocation,
+    );
 
     if (response) {
       await this.eventBus.sendEvent(
@@ -24,14 +29,17 @@ export class WeatherService implements Action {
           requestId,
           actionType: 'weather',
           serviceName: 'WEATHER_SERVICE',
-          payload: response,
+          payload: { data: response, clientId },
         },
         Events.API_RESOLVED,
       );
     }
   }
 
-  async fetchData(timestamp: number, location: string = 'Johannesburg'): Promise<any> {
+  async fetchData(
+    timestamp: number,
+    location: string = 'Johannesburg',
+  ): Promise<any> {
     const date = new Date(timestamp).toISOString();
     const options = {
       method: 'GET',
