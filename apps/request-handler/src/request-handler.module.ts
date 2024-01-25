@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EventsModule } from '@aggregator/events';
 import { LoggerModule } from '@aggregator/logger';
 import { SseManagerModule } from '@aggregator/sse-manager';
+import { SqsManagerModule } from '@aggregator/sqs-manager';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SseManagerModule } from '@aggregator/sse-manager';
     CacheManagerModule,
     EventsModule,
     SseManagerModule,
+    SqsManagerModule.forRoot({ url: process.env.REQUEST_HANDLER_SQS }),
   ],
   controllers: [RequestHandlerController],
   providers: [RequestHandlerService],

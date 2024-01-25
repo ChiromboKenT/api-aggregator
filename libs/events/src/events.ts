@@ -5,6 +5,7 @@ export namespace Events {
   export const API_REQUESTED = 'API_REQUESTED';
   export const API_REQUEST_COMPLETED = 'API_REQUEST_COMPLETED';
   export const AGGREGATOR_TRIGGERED = 'AGGREGATOR_TRIGGERED';
+  export const AGGREGATOR_COMPLETED = 'AGGREGATOR_COMPLETED';
 }
 
 export type EventType = (typeof Events)[keyof typeof Events];

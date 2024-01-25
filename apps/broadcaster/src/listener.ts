@@ -15,7 +15,6 @@ export class Listener {
     @Inject(SqsManagerService)
     private readonly sqsManagerService: SqsManagerService,
     private readonly logger: LoggerService,
-    private readonly sseHandlerService: SseManagerService,
     @Inject(EventsService) private readonly eventBus: EventsService,
     @Inject(DbManagerService) private readonly dbClient: DbManagerService,
   ) {
@@ -33,29 +32,23 @@ export class Listener {
 
       switch (attributes.EVENT) {
         case Events.API_AGGREGATED:
-          const requestId = body.requestId;
-          const params = {
-            TableName: '',
-            Key: {
-              PK: `REQUEST#${requestId}`,
-              SK: 'COMBINED',
-            },
-          };
+          const { requestId, clientId, payload } = body.requestId;
 
-          const result = await this.dbClient.getItem(params);
-          this.logger.debug('Result', { result });
+          const combinedData = await this.getCombinedData(requestId);
+          this.logger.debug('Result', { combinedData });
 
           //send result to client
           this.sendResultToClient(
-            body.clientId,
+            requestId,
+            clientId,
             'games/:id/articles/:timestamp',
-            result,
+            combinedData,
           );
           break;
 
         case Events.API_REQUEST_COMPLETED:
-          this.logger.debug('Request completed', { requestId: body.requestId });
-          this.sendResultToClient(body.clientId, 'games/:id', body.payload);
+          this.logger.debug('Request completed', { requestId });
+          this.sendResultToClient(requestId, clientId, 'games/:id', payload);
           break;
 
         default:
@@ -68,14 +61,33 @@ export class Listener {
     this.logger.debug('Message processed');
   }
 
-  async sendResultToClient(clientId, endpoint: string, payload: any) {
+  async sendResultToClient(
+    requestId,
+    clientId,
+    endpoint: string,
+    payload: any,
+  ) {
     try {
-      this.sseHandlerService.sendUpdate(clientId, endpoint, payload);
-      this.sseHandlerService.sendUpdate(clientId, endpoint, 'DONE');
+      this.logger.debug(`Sending result to client`);
+      this.eventBus.sendEvent(
+        {
+          requestId,
+          actionType: 'aggregated',
+          serviceName: 'BROADCASTER_SERVICE',
+          payload: {
+            data: payload,
+            message: `Retrieved data for ${endpoint}`,
+            clientId,
+            endpoint,
+          },
+        },
+        Events.AGGREGATOR_COMPLETED,
+      );
     } catch (error) {
       this.logger.error(`Error sending result to client:`, error);
     }
   }
+
   async getCombinedData(requestId: string): Promise<any[]> {
     this.logger.info(`Getting combined data`);
     const params: DocumentClient.QueryInput = {
@@ -83,7 +95,7 @@ export class Listener {
       KeyConditionExpression: 'PK = :pk AND begins_with(SK, :sk)',
       ExpressionAttributeValues: {
         ':pk': `REQUEST#${requestId}`,
-        ':sk': 'Combined',
+        ':sk': 'COMBINED',
       },
     };
 
@@ -96,10 +108,20 @@ export class Listener {
         return [];
       }
 
-      return (result as DocumentClient.ItemList) || [];
+      return this.mapToClientResponse(
+        (result as DocumentClient.ItemList) || [],
+      );
     } catch (error) {
       this.logger.error(`Error getting combined data: ${error.message}`);
       return [];
     }
+  }
+
+  mapToClientResponse(data: any[]): any[] {
+    return data.map((item) => {
+      return {
+        ...item.Data,
+      };
+    });
   }
 }

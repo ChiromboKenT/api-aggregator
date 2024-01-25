@@ -14,6 +14,8 @@ import { Events } from '@aggregator/events/events';
 import { Subscription } from 'rxjs';
 import { LoggerService } from '@aggregator/logger';
 import { SseManagerService } from '@aggregator/sse-manager';
+import { SqsManagerService } from '@aggregator/sqs-manager';
+import { send } from 'process';
 
 @Injectable()
 export class RequestHandlerService {
@@ -25,9 +27,22 @@ export class RequestHandlerService {
     private readonly uniqueIdGeneratorService: UniqueIdGeneratorService,
     private readonly cacheManagerService: CacheManagerService,
     private readonly sseHandlerService: SseManagerService,
+    private readonly sqsManagerService: SqsManagerService,
     private readonly logger: LoggerService,
     @Inject(EventsService) private readonly eventBus: EventsService,
   ) {}
+
+  async start() {
+    for await (const { body, ack } of this.sqsManagerService.listen<any>()) {
+      this.logger.debug('Received message', { body });
+      const { payload, serviceName } = body;
+
+      if (serviceName === 'BROADCASTER_SERVICE')
+        this.sendResultToClient(payload);
+
+      await ack();
+    }
+  }
 
   async getAllGames(
     page: number,
@@ -191,6 +206,17 @@ export class RequestHandlerService {
     };
 
     return unsubscribe;
+  }
+
+  sendResultToClient(payload: any) {
+    const { clientId, endpoint, data } = payload;
+    try {
+      this.logger.debug(`Sending final result to client`);
+      this.sseHandlerService.sendUpdate(clientId, endpoint, data);
+      this.sseHandlerService.sendUpdate(clientId, endpoint, 'DONE');
+    } catch (error) {
+      this.logger.error(`Error sending result to client:`, error);
+    }
   }
 }
 
