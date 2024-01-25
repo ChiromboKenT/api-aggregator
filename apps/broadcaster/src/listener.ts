@@ -81,7 +81,7 @@ export class Listener {
     }
   }
 
-  async getCombinedData(requestId: string): Promise<any[]> {
+  async getCombinedData(requestId: string): Promise<any> {
     this.logger.info(`Getting combined data`);
     const params: DocumentClient.QueryInput = {
       TableName: this.tableName,
@@ -111,11 +111,14 @@ export class Listener {
     }
   }
 
-  mapToClientResponse(data: any[]): any[] {
-    return data.map((item) => {
-      return {
+  mapToClientResponse(data: any[]): any {
+    let result = {};
+    data.map((item) => {
+      result = {
+        ...result,
         ...item.Data,
       };
     });
+    return result;
   }
 }

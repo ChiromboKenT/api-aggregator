@@ -1,87 +1,102 @@
 {
-  "info": {
-    "_postman_id": "fb264443-1f9d-4192-8eaa-992f6b09558b",
-    "name": "API_AGGREGATOR",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "31679171"
-  },
-  "item": [
-    {
-      "name": "Get Game Articles",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{host}}/{{url}}/games/{{gameId}}/articles/{{$isoTimestamp}}",
-          "host": ["{{host}}"],
-          "path": [
-            "{{url}}",
-            "games",
-            "{{gameId}}",
-            "articles",
-            "{{$isoTimestamp}}"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get All Games",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{host}}/{{url}}/games?page={{page}}&pageSize={{pageSize}}",
-          "host": ["{{host}}"],
-          "path": ["{{url}}", "games"],
-          "query": [
-            {
-              "key": "page",
-              "value": "{{page}}"
-            },
-            {
-              "key": "pageSize",
-              "value": "{{pageSize}}"
-            }
-          ]
-        },
-        "description": "Cached response - Fetches all games with pagination"
-      },
-      "response": []
-    },
-    {
-      "name": "Get Single Game ",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{host}}/{{url}}/games/{{gameId}}",
-          "host": ["{{host}}"],
-          "path": ["{{url}}", "games", "{{gameId}}"]
-        },
-        "description": "Cached response - fetches a single game using the game id"
-      },
-      "response": []
-    },
-    {
-      "name": "Get Game Articles",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{host}}/{{url}}/games/{{gameId}}/articles/{{$isoTimestamp}}",
-          "host": ["{{host}}"],
-          "path": [
-            "{{url}}",
-            "games",
-            "{{gameId}}",
-            "articles",
-            "{{$isoTimestamp}}"
-          ]
-        },
-        "description": "Fetches the aggregated data for the game, and weather on that parrticular day"
-      },
-      "response": []
-    }
-  ]
+	"info": {
+		"_postman_id": "fb264443-1f9d-4192-8eaa-992f6b09558b",
+		"name": "API_AGGREGATOR",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31679171"
+	},
+	"item": [
+		{
+			"name": "Get Game Articles",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/{{url}}/games/{{gameId}}/articles/{{$isoTimestamp}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"{{url}}",
+						"games",
+						"{{gameId}}",
+						"articles",
+						"{{$isoTimestamp}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Games",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/{{url}}/games?page={{page}}&pageSize={{pageSize}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"{{url}}",
+						"games"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "{{page}}"
+						},
+						{
+							"key": "pageSize",
+							"value": "{{pageSize}}"
+						}
+					]
+				},
+				"description": "Cached response - Fetches all games with pagination"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Single Game ",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/{{url}}/games/{{gameId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"{{url}}",
+						"games",
+						"{{gameId}}"
+					]
+				},
+				"description": "Cached response - fetches a single game using the game id"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Game Articles",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/{{url}}/games/{{gameId}}/articles/{{timestamp}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"{{url}}",
+						"games",
+						"{{gameId}}",
+						"articles",
+						"{{timestamp}}"
+					]
+				},
+				"description": "Fetches the aggregated data for the game, and weather on that parrticular day"
+			},
+			"response": []
+		}
+	]
 }

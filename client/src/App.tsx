@@ -41,12 +41,12 @@ const App: React.FC = () => {
         'Content-Type': 'application/json',
       };
 
-      const source = new SSE(`http://api/v1/sse${prompt}`, {
+      const source = new SSE(`http://localhost:6010/api/v1/sse${prompt}`, {
         headers,
         method: SSEOptionsMethod.GET,
       });
 
-      source.addEventListener('message', (event: CustomEventType) => {
+      source.addEventListener('data', (event: CustomEventType) => {
         const dataEvent = event as CustomEventDataType;
         if (dataEvent.data !== 'DONE') {
           const payload = JSON.parse(dataEvent.data);

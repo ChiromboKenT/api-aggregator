@@ -20,7 +20,6 @@ import { Subscription } from 'rxjs';
 import { LoggerService } from '@aggregator/logger';
 import { SseManagerService } from '@aggregator/sse-manager';
 import { SqsManagerService } from '@aggregator/sqs-manager';
-import { send } from 'process';
 
 @Injectable()
 export class RequestHandlerService {
@@ -48,7 +47,7 @@ export class RequestHandlerService {
 
       if (serviceName === 'BROADCASTER_SERVICE') {
         //Send result to client
-        this.logger.debug(`Sending result to client: ${payload.message}`);
+        this.logger.debug(`Sending result to client: ${payload.endpoint}`);
         this.sseHandlerService.sendUpdate(
           payload.endpoint,
           payload.clientId,
@@ -211,7 +210,10 @@ export class RequestHandlerService {
 
     // Subscribe to updates
     const subscription = channel.subscribe((update) => {
-      client.write(`data: ${update}\n\n`);
+      client.write(`data: ${JSON.stringify(update)}\n`);
+      if (update === 'DONE') {
+        client.end('DONE');
+      }
     });
 
     // Save the subscription and client

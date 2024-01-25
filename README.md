@@ -22,18 +22,20 @@ your preferred browseror use postman.
 
 View frontend client
 ```
-https://localhost:80
+https://localhost:3000
 
 ```
 To use client paste a relative path into the dialog eg:
+Fetch Game Article (Augmented game data)
+```bash
+/games/20/articles/1516865565000
+```
+
 Fetch Games
 ```bash
 /games?page=1&pageSize=10
 ```
-Fetch Game Article (Augmented game data)
-```bash
-/games/20/articles/1546293600
-```
+
 
 To Access Backend API - Directly
 ```bash
@@ -54,7 +56,12 @@ Example Endpoints
   curl -X GET "http://localhost:6010/api/v1/sse/games/20/1546293600
 ```
 
-
+Can import postman colloection into Postman client
+```
+API_AGGREGATOR.postman_collection.json
+```
+OR
+[<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/31679171-fb264443-1f9d-4192-8eaa-992f6b09558b?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D31679171-fb264443-1f9d-4192-8eaa-992f6b09558b%26entityType%3Dcollection%26workspaceId%3D24272aaa-c227-4af1-9843-77e7fefd12ca)
 
 To spin up the react front end use the following
 ```bash

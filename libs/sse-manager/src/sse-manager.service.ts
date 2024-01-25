@@ -16,7 +16,7 @@ export class SseManagerService {
     }
 
     this.logger.debug('Channel retrieved', {
-      channel: this.channels[channelKey],
+      channelKey,
     });
 
     return this.channels[channelKey];
@@ -24,8 +24,6 @@ export class SseManagerService {
 
   sendUpdate(clientId: string, endpoint: string, update: string): void {
     const channel = this.getClientChannel(clientId, endpoint);
-
-    this.logger.debug('Sending update to client', { channel, update });
 
     channel.next(update);
   }

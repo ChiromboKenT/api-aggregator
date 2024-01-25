@@ -55,11 +55,11 @@ export class RequestHandlerController {
     const unsubscribe = this.requestHandlerService.registerClient(
       response,
       clientId,
-      `games/${id}`,
+      `games/:id`,
     );
 
     // Configure SSE
-    this.configureSSE(response, unsubscribe, `games/${id}`);
+    this.configureSSE(response, unsubscribe, `games/:id`);
   }
 
   @Get('/games/:id/articles/:timestamp')
@@ -84,14 +84,10 @@ export class RequestHandlerController {
     const unsubscribe = this.requestHandlerService.registerClient(
       response,
       clientId,
-      `games/${id}/articles/${timestamp}`,
+      `games/:id/articles/:timestamp`,
     );
     // Configure SSE
-    this.configureSSE(
-      response,
-      unsubscribe,
-      `games/${id}/articles/${timestamp}`,
-    );
+    this.configureSSE(response, unsubscribe, `games/:id/articles/:timestamp`);
   }
 
   configureSSE = (response: Response, unsubscribe, url: string) => {
